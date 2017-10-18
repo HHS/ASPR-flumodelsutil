@@ -1,0 +1,14 @@
+Package: fitflumodels
+Title: Flu fitting package
+Version: 0.11
+Date: 2015-11-20
+Authors@R: c(person("Matt", "Clay", email = "clay.matt@gmail.com", role = c("aut", "cre")),
+  person("Jason", "Asher", email = "jason.m.asher@gmail.com", role = c("ctb")))
+Description: Collection of tools to fit influenza data, rebin contact matrices, and match ILI data.
+Depends: R (>= 3.1.2), flumodels
+Imports: alabama,cdcfluview,dplyr,magrittr
+Suggests: acs
+License: Unlimited
+LazyData: true
+Encoding: UTF-8
+RoxygenNote: 6.0.1
