@@ -4,16 +4,14 @@
 \alias{getPopulationFractions}
 \title{Get population fractions}
 \usage{
-getPopulationFractions(ages, year = 2015,
-  population = population.US[population.US$AGE != 999 & population.US$YEAR ==
-  year & population.US$MONTH == 1, c("AGE", "TOT_POP")])
+getPopulationFractions(ages, year = 2015, population)
 }
 \arguments{
 \item{ages}{Vector of ages. Each element represents the upper range of an age range. The lowest bound is presumed to be zero.
 If the oldest age does not reach the end of the population range, an additional element is added to span the full range.
-This function uses the population.US data included in this package.
-A future element could use the acs package to download data dynamically, but that requires the user to request an individual
-key from the ACS for access, which would make this package fare less accessible.}
+This function by default uses \code{fitflumodels_data$population.US} for age information (2015 US population).
+One could also use the \code{acs} package to download data dynamically, but that requires the user to request an individual
+key from the ACS for access.}
 
 \item{year}{Year to sample population from. Defaults to 2015.}
 

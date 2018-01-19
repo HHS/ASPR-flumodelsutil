@@ -1,4 +1,4 @@
-#' @title fitIncidence
+#' @title Fit incidence
 #' @description Fits a given incidence curve. Fits R0, generation time, seed infections, and prior immunity fractions (1 for each age group).
 #'    Uses a model from the flumodels package. All parameters that are provided as a list are presumed
 #'    to be something to fit. The list can be of either length two with the first list entry should be the low and the second list entry
@@ -7,7 +7,7 @@
 #'    and high values.
 #'
 #'    The only difference in parameters between this and the SEIRModel-family is that
-#'    latentPeriod and infectiousPerios are re-defined as generationTime and latentPercent. It is
+#'    latentPeriod and infectiousPeriod are re-defined as generationTime and latentPercent. It is
 #'    expected that a fit may fix latentPercent and then allow generationTime to vary rather than
 #'    fitting both latent and infectious periods.
 #'
@@ -29,9 +29,12 @@
 #'    the alabama package's constrOptim.nl method to be called). Not applicable as a fit parameter. Defaults to L-BFGS-B.
 #' @param seedWeeksBeforeIncidence Weeks before the start of the supplied incidence curve to seed initial infections. Integer. Defaults to 0.
 #' @param attackRatesToMatch Population-group specific attack rates to match. Not applicable as a fit parameter.
-#' @param fractionSymptomatic The fraction of cases that are symptomatic. Not a parameter to fit. Defaults to 0.5.
+#' @param symptomaticIncidence Is the incidence serological or symptomatic. Defaults to false (serological).
+#' @param fractionSymptomatic The fraction of cases that are symptomatic. Not a parameter to fit. Only used
+#'     if symptomaticIncidence is set to true. Defaults to 0.5.
 #' @param weightIncidenceTimeseries What relative weight to the penalty function should the incidence timeseries receive? Defaults to 1.
 #' @param weightAttackRates What relative weight to the penalty function should the age-specific attack rates receive? Defaults to 1.
+#' @param weightOverallAttackRate What relative weight to the penalty function should the overall attack rate receive? Defaults to 10.
 #' @param ... Any other parameter to pass to a flumodel. Any of these may be specified as a list and thus fit. The parameters specified
 #'    (vaccine, 2-dose vaccine, antiviral, etc.) will determine the type of flumodel used.
 #' @return A fitIncidence object
@@ -40,8 +43,9 @@
 #' @author Matt Clay <clay.matt@gmail.com>
 #' @export
 fitIncidence <- function(incidence, population, populationFractions, contactMatrix,
-                         R0, generationTime, latentPercent, method = "L-BFGS-B", seedWeeksBeforeIncidence = 0, attackRatesToMatch, 
-                         fractionSymptomatic = 0.5, weightIncidenceTimeseries = 1, weightAttackRates = 1, ...) {
+                         R0, generationTime, latentPercent, method = "L-BFGS-B", seedWeeksBeforeIncidence = 0, 
+                         attackRatesToMatch, symptomaticIncidence = FALSE, fractionSymptomatic = 0.5, 
+                         weightIncidenceTimeseries = 1, weightAttackRates = 1, weightOverallAttackRate = 10, ...) {
   
   if (missing(incidence))
     stop("Incidence must be specified")
@@ -68,7 +72,8 @@ fitIncidence <- function(incidence, population, populationFractions, contactMatr
   
   # Skip these variables when thinking of what might be variable
   arguments.internal <- c("incidence", "method", "attackRatesToMatch", "seedWeeksBeforeIncidence", "fractionSymptomatic",
-                          "weightIncidenceTimeseries", "weightAttackRates")
+                          "weightIncidenceTimeseries", "weightAttackRates", "weightOverallAttackRate",
+                          "symptomaticIncidence")
   parameters.SEIR.fixed <- parameters.fixed[ -which(names(parameters.fixed) %in% arguments.internal)]
   # Set the minimul length of the simulation to be 35 weeks or ( the amount of incidence data we have + the seed week offset )
   parameters.SEIR.fixed <- c(parameters.SEIR.fixed,
@@ -76,8 +81,16 @@ fitIncidence <- function(incidence, population, populationFractions, contactMatr
   parameters.internal <- argument.list[which(names(argument.list) %in% arguments.internal)]
   argument.list <- argument.list[ -which(names(argument.list) %in% arguments.internal)]
   
+  
+  # Set parameters.internal to defaults if they weren't passed arguments
+  if (sum(names(parameters.internal) == "symptomaticIncidence") == 0)
+    parameters.internal$symptomaticIncidence <- symptomaticIncidence
   if (sum(names(parameters.internal) == "method") == 0)
     parameters.internal$method <- method
+  if (sum(names(parameters.internal) == "fractionSymptomatic") == 0)
+    parameters.internal$fractionSymptomatic <- fractionSymptomatic
+  if (sum(names(parameters.internal) == "seedWeeksBeforeIncidence") == 0)
+    parameters.internal$seedWeeksBeforeIncidence <- seedWeeksBeforeIncidence
   
   parameters.to.fit <- argument.list[unlist(lapply(argument.list, is.list))]
   
@@ -138,10 +151,11 @@ fitIncidence <- function(incidence, population, populationFractions, contactMatr
                       parameters.internal,
                       list(upper = bound.upper),
                       list(lower = bound.lower),
-                      list(control = list(factr = 1e7, parscale = bound.start))
+                      list(control = list(factr = 1e7))
   )
   
-  # return(parameters.opt)
+  # parscale seems quite off, leading the optimizer to totally incorrect results.
+  #, parscale = bound.start
   
   if (method == "L-BFGS-B")
     opt <- do.call("optim", parameters.opt)
@@ -161,7 +175,7 @@ fitIncidence <- function(incidence, population, populationFractions, contactMatr
   parameters.fitted <- vector(mode = "list", length = length(parameters.to.fit))
   names(parameters.fitted) <- names(parameters.to.fit)
   fitLocation <- 1
-  for (parameterIterator in 1:length(parameters.to.fit)) {
+  for (parameterIterator in seq_len(parameters.to.fit)) {
     parameter <- names(parameters.to.fit)[parameterIterator]
     value <- parameters.to.fit[[which(names(parameters.to.fit) == parameter)]]
     value.length <- length(value[[1]])
@@ -229,26 +243,31 @@ fitIncidence <- function(incidence, population, populationFractions, contactMatr
 #' @param SEIRModel.optimize SEIRModel function that we should use to simulate outbreak.
 #' @param parameters.to.fit.names Names of parameters to fit.
 #' @param parameters.SEIR.fixed.names Names of fixed parameters for SEIR model.
-#' @param fractionSymptomatic The fraction of cases that are symptomatic. Not a parameter to fit.
+#' @param symptomaticIncidence Is the incidence serological or symptomatic. Defaults to false (serological).
+#' @param fractionSymptomatic The fraction of cases that are symptomatic. Not a parameter to fit. Only used
+#'     if symptomaticIncidence is set to true. Defaults to 0.5.
 #' @param seedWeeksBeforeIncidence Days before the start of the supplied incidence curve to seed initial infections.
 #' @param weightIncidenceTimeseries What relative weight to the penalty function should the incidence timeseries receive? Defaults to 1.
 #' @param weightAttackRates What relative weight to the penalty function should the age-specific attack rates receive? Defaults to 1.
+#' @param weightOverallAttackRate What relative weight to the penalty function should the overall attack rate receive? Defaults to 10.
 #' @return Fit value for optim
 #' @keywords internal
 optimize.SEIRV <- function(bound.fit, incidence, attackRatesToMatch, SEIRModel.optimize, 
                            parameters.to.fit.names,
                            parameters.SEIR.fixed.names, 
-                           fractionSymptomatic,
+                           symptomaticIncidence = FALSE,
+                           fractionSymptomatic = 0.5,
                            seedWeeksBeforeIncidence, 
                            weightIncidenceTimeseries = 1,
-                           weightAttackRates = 1, ...) {
+                           weightAttackRates = 1,
+                           weightOverallAttackRate = 10, ...) {
   
   argument.list <- as.list(match.call())[-1]
   
   parameters.to.model <- vector(mode = "list", length = length(parameters.to.fit.names))
   names(parameters.to.model) <- parameters.to.fit.names
   fitLocation <- 1
-  for (parameterIterator in 1:length(parameters.to.fit.names)) {
+  for (parameterIterator in seq_len(parameters.to.fit.names)) {
     value <- argument.list[[which(names(argument.list) == parameters.to.fit.names[parameterIterator])]]
     value.length <- length(value[[1]])
     parameters.to.model[[parameterIterator]] <- unlist(bound.fit[fitLocation:(fitLocation + value.length - 1)])
@@ -296,10 +315,12 @@ optimize.SEIRV <- function(bound.fit, incidence, attackRatesToMatch, SEIRModel.o
   SEIR.penalty.function(model = model, incidence = incidence, 
                         attackRatesToMatch = attackRatesToMatch, populationFractions = parameters.to.model$populationFractions,
                         population = parameters.to.model$population,
+                        symptomaticIncidence = symptomaticIncidence,
                         fractionSymptomatic = fractionSymptomatic,
                         seedWeeksBeforeIncidence = seedWeeksBeforeIncidence,
                         weightIncidenceTimeseries = weightIncidenceTimeseries,
-                        weightAttackRates = weightAttackRates)
+                        weightAttackRates = weightAttackRates,
+                        weightOverallAttackRate = weightOverallAttackRate)
 }
 
 #' @title Penalty function for SEIR-type models
@@ -309,31 +330,39 @@ optimize.SEIRV <- function(bound.fit, incidence, attackRatesToMatch, SEIRModel.o
 #' @param attackRatesToMatch Attack rates for population groups
 #' @param populationFractions Population fractions
 #' @param population Total population, Default: 1
-#' @param fractionSymptomatic The fraction of cases that are symptomatic. Defaults to 0.5
+#' @param symptomaticIncidence Is the incidence serological or symptomatic. Defaults to false (serological).
+#' @param fractionSymptomatic The fraction of cases that are symptomatic. Not a parameter to fit. Only used
+#'     if symptomaticIncidence is set to true. Defaults to 0.5.
 #' @param seedWeeksBeforeIncidence Days before the start of the supplied incidence curve to seed initial infections.
 #' @param weightIncidenceTimeseries What relative weight to the penalty function should the incidence timeseries receive? Defaults to 1.
 #' @param weightAttackRates What relative weight to the penalty function should the age-specific attack rates receive? Defaults to 1.
+#' @param weightOverallAttackRate What relative weight to the penalty function should the overall attack rate receive? Defaults to 10.
 #' @return Total penalty
 #' @keywords internal
 #' @importFrom flumodels getInfectionTimeSeries getInfections
-SEIR.penalty.function <- function(model, incidence, attackRatesToMatch, populationFractions, population = 1, fractionSymptomatic = 0.5,
-                                  seedWeeksBeforeIncidence = 0, weightIncidenceTimeseries = 1, weightAttackRates = 1) {
+SEIR.penalty.function <- function(model, incidence, attackRatesToMatch, populationFractions, 
+                                  population = 1, symptomaticIncidence = FALSE, fractionSymptomatic = 0.5,
+                                  seedWeeksBeforeIncidence = 0, weightIncidenceTimeseries = 1, 
+                                  weightAttackRates = 1, weightOverallAttackRate = 30) {
   infections.by.week.overall <- flumodels::getInfectionTimeSeries(model, incidence = TRUE, byGroup = FALSE, asRate = TRUE,
-                                                                  symptomatic = TRUE, fractionSymptomatic = fractionSymptomatic, 
+                                                                  symptomatic = symptomaticIncidence, fractionSymptomatic = fractionSymptomatic, 
                                                                   byWeek = TRUE)
   infections.by.week.overall <- infections.by.week.overall[is.na(infections.by.week.overall) == FALSE]
   
-  # Simple L2 norm of differences by age bin (rescaled from millions)
-  infections.by.week.error <- sqrt(sum( ( ( infections.by.week.overall[1:length(incidence) + seedWeeksBeforeIncidence] -
-                                         incidence / population) /
-                                       max(incidence / population) )^2))
+  # Simple L2 norm of differences in overall infections (rescaled to be a rate)
+  infections.by.week.error <- sqrt(sum( ( infections.by.week.overall[seq_len(incidence) + seedWeeksBeforeIncidence] -
+                                         incidence / population )^2 ))  / max(incidence / population)
   
   # Then compare attack rates by age category
-  infections <- flumodels::getInfections(model, asRate = TRUE, symptomatic = TRUE, fractionSymptomatic = fractionSymptomatic)
+  infections <- flumodels::getInfections(model, asRate = TRUE, symptomatic = symptomaticIncidence, fractionSymptomatic = fractionSymptomatic)
   infections.error <- sqrt(sum( ((infections / populationFractions - attackRatesToMatch) / max(attackRatesToMatch))^2))
   
-  return ( (weightIncidenceTimeseries * infections.by.week.error  + weightAttackRates * infections.error) / 
-             (weightIncidenceTimeseries + weightAttackRates))
+  # Now compare overall attack rate
+  infections.overall.error <- abs(sum(infections) - sum(attackRatesToMatch * populationFractions)) / max(attackRatesToMatch)
+  
+  return ( (weightIncidenceTimeseries * infections.by.week.error  + weightAttackRates * infections.error + 
+              weightOverallAttackRate * infections.overall.error) / 
+             (weightIncidenceTimeseries + weightAttackRates + weightOverallAttackRate))
 }
 
 
@@ -344,7 +373,7 @@ SEIR.penalty.function <- function(model, incidence, attackRatesToMatch, populati
 constraint.function <- function(x, lower, upper, ...) {
   constraint <- numeric(2*length(x))
   
-  for (currentVariable in 1:length(x)) {
+  for (currentVariable in seq_len(x)) {
     constraint[(currentVariable-1)*2+1] <- x[currentVariable] - lower[currentVariable]
     constraint[currentVariable*2] <- upper[currentVariable] - x[currentVariable]
   }
@@ -362,7 +391,7 @@ constraint.function <- function(x, lower, upper, ...) {
 constraint.jacobian.create <- function(x, variables = length(x)) {
   jacobian <- matrix(0, 2 * variables, variables)
   
-  for (currentVariable in 1:variables) {
+  for (currentVariable in seq_len(variables)) {
     jacobian[(currentVariable-1)*2+1,] <- c( rep(0, currentVariable - 1), 1,
                                              rep(0, variables - currentVariable) )
     jacobian[currentVariable*2,] <- c( rep(0, currentVariable - 1), -1,

@@ -2,13 +2,14 @@
 % Please edit documentation in R/fitIncidence.R
 \name{fitIncidence}
 \alias{fitIncidence}
-\title{fitIncidence}
+\title{Fit incidence}
 \usage{
 fitIncidence(incidence, population, populationFractions, contactMatrix, R0,
   generationTime, latentPercent, method = "L-BFGS-B",
   seedWeeksBeforeIncidence = 0, attackRatesToMatch,
-  fractionSymptomatic = 0.5, weightIncidenceTimeseries = 1,
-  weightAttackRates = 1, ...)
+  symptomaticIncidence = FALSE, fractionSymptomatic = 0.5,
+  weightIncidenceTimeseries = 1, weightAttackRates = 1,
+  weightOverallAttackRate = 10, ...)
 }
 \arguments{
 \item{incidence}{Data frame of weekly incidence. Columns are week & incidence, corresponding to week number [0-53] &
@@ -37,11 +38,16 @@ the alabama package's constrOptim.nl method to be called). Not applicable as a f
 
 \item{attackRatesToMatch}{Population-group specific attack rates to match. Not applicable as a fit parameter.}
 
-\item{fractionSymptomatic}{The fraction of cases that are symptomatic. Not a parameter to fit. Defaults to 0.5.}
+\item{symptomaticIncidence}{Is the incidence serological or symptomatic. Defaults to false (serological).}
+
+\item{fractionSymptomatic}{The fraction of cases that are symptomatic. Not a parameter to fit. Only used
+if symptomaticIncidence is set to true. Defaults to 0.5.}
 
 \item{weightIncidenceTimeseries}{What relative weight to the penalty function should the incidence timeseries receive? Defaults to 1.}
 
 \item{weightAttackRates}{What relative weight to the penalty function should the age-specific attack rates receive? Defaults to 1.}
+
+\item{weightOverallAttackRate}{What relative weight to the penalty function should the overall attack rate receive? Defaults to 10.}
 
 \item{...}{Any other parameter to pass to a flumodel. Any of these may be specified as a list and thus fit. The parameters specified
 (vaccine, 2-dose vaccine, antiviral, etc.) will determine the type of flumodel used.}
@@ -58,7 +64,7 @@ Fits a given incidence curve. Fits R0, generation time, seed infections, and pri
    and high values.
 
    The only difference in parameters between this and the SEIRModel-family is that
-   latentPeriod and infectiousPerios are re-defined as generationTime and latentPercent. It is
+   latentPeriod and infectiousPeriod are re-defined as generationTime and latentPercent. It is
    expected that a fit may fix latentPercent and then allow generationTime to vary rather than
    fitting both latent and infectious periods.
 

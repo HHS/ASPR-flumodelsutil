@@ -21,3 +21,13 @@
 # drive <- "e:"; detach("package:fitfludata", unload=TRUE); install.packages(paste0(drive, "/shinyFlu/fitFluData/"), type = "source", repos = NULL); library(fitFluData)
 # 
 # pandemic.deaths <- read_csv("d:/my docs/flu/historical flu/pandemic_timeseries_R.csv")
+
+# fitflumodels_data <- list()
+# fitflumodels_data$population.US <- population.US
+# fitflumodels_data$population.UK <- population.UK
+# fitflumodels_data$ILI.data <- ILI.data
+# fitflumodels_data$pandemic.deaths <- pandemic.deaths
+# fitflumodels_data$population.US.total <- as.numeric( population.US[population.US$AGE == 999 & population.US$MONTH == 1, "TOT_POP"] )
+# fitflumodels_data$POLYMOD.matrix <- POLYMOD.matrix
+# fitflumodels_data$POLYMOD.age.ranges <- POLYMOD.age.ranges
+# save(fitflumodels_data, file = "./data/fitflumodels_data.rda")

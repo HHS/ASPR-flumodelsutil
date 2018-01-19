@@ -5,9 +5,9 @@
 \title{Get vaccine uptake multiplier from overall vaccine allocation fractions}
 \usage{
 getVaccineUptakeMultiplierFromAllocation(ages,
-  population = fitflumodels::population.US \%>\% dplyr::filter(YEAR == year &
-  MONTH == 1 & AGE != 999) \%>\% dplyr::select(AGE, TOT_POP), year = 2015,
-  originalAllocation, originalAllocationAges)
+  population = fitflumodels::fitflumodels_data$population.US \%>\%
+  dplyr::filter(YEAR == year & MONTH == 1 & AGE != 999) \%>\% dplyr::select(AGE,
+  TOT_POP), year = 2015, originalAllocation, originalAllocationAges)
 }
 \arguments{
 \item{ages}{Vector of ages. Each element represents the upper range of an age range. The lowest bound is presumed to be zero.

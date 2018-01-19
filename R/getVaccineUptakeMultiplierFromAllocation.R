@@ -16,7 +16,7 @@
 #' @importFrom magrittr "%>%"
 #' @export
 getVaccineUptakeMultiplierFromAllocation <- function(ages,
-                                                     population = fitflumodels::population.US %>%
+                                                     population = fitflumodels::fitflumodels_data$population.US %>%
                                                        dplyr::filter(YEAR == year & MONTH == 1 & AGE != 999) %>%
                                                        dplyr::select(AGE, TOT_POP),
                                                      year = 2015,

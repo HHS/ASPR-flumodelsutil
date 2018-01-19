@@ -13,18 +13,19 @@
 #' @export
 rescaleIncidence <- function(incidence, totalInfections, weeksOfBackground = 3) {
 
-  if(sum(incidence < 0))
+  if (sum(incidence < 0))
     stop("incidence cannot be < 0")
 
-  if(totalInfections <= 0)
+  if (totalInfections <= 0)
     stop("totalInfections cannot be <= 0")
 
-  if((weeksOfBackground - round(weeksOfBackground) != 0) || weeksOfBackground < 0 || weeksOfBackground >= 0.5*length(incidence))
+  if ( (weeksOfBackground - round(weeksOfBackground) != 0) || weeksOfBackground < 0 || weeksOfBackground >= 0.5 * length(incidence))
     stop("weeksOfBackground must be an integer between 0 and 1/2 length(incidence)")
 
   # Take background to be the mean of the weeksOfBackground
   if (weeksOfBackground != 0)
-    incidence.background <- mean(c(incidence[1:weeksOfBackground], incidence[(length(incidence)-weeksOfBackground-1):length(incidence)]))
+    incidence.background <- mean(c(incidence[seq_len(weeksOfBackground)], 
+                                   incidence[seq.int(length(incidence) - weeksOfBackground - 1, length(incidence))]))
   else
     incidence.background <- 0
 
@@ -34,9 +35,10 @@ rescaleIncidence <- function(incidence, totalInfections, weeksOfBackground = 3) 
   # Remove baseline incidence. Should likely make this more detailed by finding something more than min.
   # incidence.rescaled <- incidence - min(incidence)
 
-  week <- 1:length(incidence)
+  week <- seq_len(incidence)
 
-  AUC <- sum(diff(week)*(incidence.rescaled[1:(length(incidence.rescaled)-1)] + incidence.rescaled[2:length(incidence.rescaled)])/2)
+  AUC <- sum(diff(week) * (incidence.rescaled[seq_len(length(incidence.rescaled) - 1)] + 
+                           incidence.rescaled[seq.int(2, length(incidence.rescaled))]) / 2)
   incidence.rescaled <- incidence.rescaled / AUC
 
   # Return the incidence

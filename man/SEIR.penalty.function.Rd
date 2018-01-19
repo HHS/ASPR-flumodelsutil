@@ -5,8 +5,9 @@
 \title{Penalty function for SEIR-type models}
 \usage{
 SEIR.penalty.function(model, incidence, attackRatesToMatch, populationFractions,
-  population = 1, fractionSymptomatic = 0.5, seedWeeksBeforeIncidence = 0,
-  weightIncidenceTimeseries = 1, weightAttackRates = 1)
+  population = 1, symptomaticIncidence = FALSE, fractionSymptomatic = 0.5,
+  seedWeeksBeforeIncidence = 0, weightIncidenceTimeseries = 1,
+  weightAttackRates = 1, weightOverallAttackRate = 30)
 }
 \arguments{
 \item{model}{SEIR-type model}
@@ -19,13 +20,18 @@ SEIR.penalty.function(model, incidence, attackRatesToMatch, populationFractions,
 
 \item{population}{Total population, Default: 1}
 
-\item{fractionSymptomatic}{The fraction of cases that are symptomatic. Defaults to 0.5}
+\item{symptomaticIncidence}{Is the incidence serological or symptomatic. Defaults to false (serological).}
+
+\item{fractionSymptomatic}{The fraction of cases that are symptomatic. Not a parameter to fit. Only used
+if symptomaticIncidence is set to true. Defaults to 0.5.}
 
 \item{seedWeeksBeforeIncidence}{Days before the start of the supplied incidence curve to seed initial infections.}
 
 \item{weightIncidenceTimeseries}{What relative weight to the penalty function should the incidence timeseries receive? Defaults to 1.}
 
 \item{weightAttackRates}{What relative weight to the penalty function should the age-specific attack rates receive? Defaults to 1.}
+
+\item{weightOverallAttackRate}{What relative weight to the penalty function should the overall attack rate receive? Defaults to 10.}
 }
 \value{
 Total penalty

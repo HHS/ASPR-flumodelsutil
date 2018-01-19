@@ -14,9 +14,9 @@
 #' @return A contact matrix.
 #' @author Jason Asher <jason.m.asher@gmail.com>
 #' @export
-makeContactMatrix <- function( ages, originalContactMatrix = fitflumodels::POLYMOD.matrix, 
-                               originalContactMatrixAges = fitflumodels::POLYMOD.age.ranges,
-                               originalPopulationFractions = fitflumodels::population.UK) {
+makeContactMatrix <- function( ages, originalContactMatrix = fitflumodels::fitflumodels_data$POLYMOD.matrix, 
+                               originalContactMatrixAges = fitflumodels::fitflumodels_data$POLYMOD.age.ranges,
+                               originalPopulationFractions = fitflumodels::fitflumodels_data$population.UK) {
 
   if (is.unsorted(ages))
     stop("Ages must be increasing order")
@@ -55,10 +55,10 @@ makeContactMatrix <- function( ages, originalContactMatrix = fitflumodels::POLYM
   #Re-group the matrix of expected contacts
   regroupedMatrixOfContacts <- matrix(0, nrow = ncol(newAgeRanges), ncol = ncol(newAgeRanges),
                                       dimnames = list(names(newAgeRanges),names(newAgeRanges))) #Initialize with a zero matrix
-  for (newRowIndex in 1:ncol(newAgeRanges)) {
-    for (newColumnIndex in 1:ncol(newAgeRanges)){
-      for (rowIndex in 1:ncol(originalContactMatrixAges)) {
-        for (columnIndex in 1:ncol(originalContactMatrixAges))
+  for (newRowIndex in seq_along(ncol(newAgeRanges))) {
+    for (newColumnIndex in seq_along(ncol(newAgeRanges))){
+      for (rowIndex in seq_along(ncol(originalContactMatrixAges))) {
+        for (columnIndex in seq_along(ncol(originalContactMatrixAges)))
           regroupedMatrixOfContacts[newRowIndex, newColumnIndex] <-
             regroupedMatrixOfContacts[newRowIndex, newColumnIndex] +
             (symmetrizedMatrixOfContacts[rowIndex, columnIndex] *
@@ -93,7 +93,7 @@ makeContactMatrix <- function( ages, originalContactMatrix = fitflumodels::POLYM
 #Assumes constant interpolation between age groups when subdividing ranges
 getPopulationForAgeRange <- function(ageRange, ages, population) {
   ageRangePopulation <- 0
-  for (columnIndex in 1:ncol(ages)) {
+  for (columnIndex in seq_along(ncol(ages))) {
     ageRangePopulation <- ageRangePopulation + (getAgeRangeFraction(columnIndex, ageRange, ages) * as.numeric(population[columnIndex]))
   }
   ageRangePopulation
@@ -133,7 +133,7 @@ makeAgeRangesFromInputs <- function(ages) {
   newFrame <- data.frame("col1" = c(AgeStart = 0, AgeEnd = ages[1]))
   names(newFrame) <- paste0("Age00to", ages[1])
 
-  for (currentAge in 2:length(ages)) {
+  for (currentAge in seq.int(2, length(ages))) {
     newFrame[, paste0("Age", ages[currentAge-1]+1, "to", ages[currentAge])] <-
       c(AgeStart = ages[currentAge-1]+1, AgeEnd = ages[currentAge])
   }

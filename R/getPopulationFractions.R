@@ -2,20 +2,24 @@
 #' @description Gets population fractions for a given set of age ranges
 #' @param ages Vector of ages. Each element represents the upper range of an age range. The lowest bound is presumed to be zero.
 #'    If the oldest age does not reach the end of the population range, an additional element is added to span the full range.
-#'    This function uses the population.US data included in this package.
-#'    A future element could use the acs package to download data dynamically, but that requires the user to request an individual
-#'    key from the ACS for access, which would make this package fare less accessible.
+#'    This function by default uses \code{fitflumodels_data$population.US} for age information (2015 US population).
+#'    One could also use the \code{acs} package to download data dynamically, but that requires the user to request an individual
+#'    key from the ACS for access.
 #' @param year Year to sample population from. Defaults to 2015.
 #' @param population Population data frame that contains age and population values. Defaults to 2015 US population.
 #'    The two required columns of the data frame are AGE and TOT_POP.
 #' @return A vector population fractions that sums to 1
-#' @importFrom dplyr filter select summarise
 #' @author Matt Clay <clay.matt@gmail.com>
 #' @export
 getPopulationFractions <- function(ages,
                                    year = 2015,
-                                   population = population.US[population.US$AGE != 999 & population.US$YEAR == year & population.US$MONTH == 1, c("AGE", "TOT_POP")]) {
-
+                                   population) {
+  
+  if (sum(names(match.call()) == "population") == 0)
+    population <- fitflumodels::fitflumodels_data$population.US[fitflumodels::fitflumodels_data$population.US$AGE != 999 & 
+                                                                  fitflumodels::fitflumodels_data$population.US$YEAR == year & 
+                                                                  fitflumodels::fitflumodels_data$population.US$MONTH == 1, c("AGE", "TOT_POP")]
+  
   if(nrow(population) == 0)
     stop("No population for given year")
 

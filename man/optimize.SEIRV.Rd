@@ -5,9 +5,10 @@
 \title{Compute fit value for SEIR models}
 \usage{
 optimize.SEIRV(bound.fit, incidence, attackRatesToMatch, SEIRModel.optimize,
-  parameters.to.fit.names, parameters.SEIR.fixed.names, fractionSymptomatic,
+  parameters.to.fit.names, parameters.SEIR.fixed.names,
+  symptomaticIncidence = FALSE, fractionSymptomatic = 0.5,
   seedWeeksBeforeIncidence, weightIncidenceTimeseries = 1,
-  weightAttackRates = 1, ...)
+  weightAttackRates = 1, weightOverallAttackRate = 10, ...)
 }
 \arguments{
 \item{bound.fit}{Guess for current iteration.}
@@ -22,13 +23,18 @@ optimize.SEIRV(bound.fit, incidence, attackRatesToMatch, SEIRModel.optimize,
 
 \item{parameters.SEIR.fixed.names}{Names of fixed parameters for SEIR model.}
 
-\item{fractionSymptomatic}{The fraction of cases that are symptomatic. Not a parameter to fit.}
+\item{symptomaticIncidence}{Is the incidence serological or symptomatic. Defaults to false (serological).}
+
+\item{fractionSymptomatic}{The fraction of cases that are symptomatic. Not a parameter to fit. Only used
+if symptomaticIncidence is set to true. Defaults to 0.5.}
 
 \item{seedWeeksBeforeIncidence}{Days before the start of the supplied incidence curve to seed initial infections.}
 
 \item{weightIncidenceTimeseries}{What relative weight to the penalty function should the incidence timeseries receive? Defaults to 1.}
 
 \item{weightAttackRates}{What relative weight to the penalty function should the age-specific attack rates receive? Defaults to 1.}
+
+\item{weightOverallAttackRate}{What relative weight to the penalty function should the overall attack rate receive? Defaults to 10.}
 }
 \value{
 Fit value for optim

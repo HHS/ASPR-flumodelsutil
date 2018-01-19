@@ -15,12 +15,15 @@ print.fitIncidence <- function(x, ...) {
   cat("Reference attack rates are:", "\n")
   cat(paste0(round(100*x$parameters.internal$attackRatesToMatch, 2), "%"), "\n")
   cat("Calculated attack rates are:", "\n")
-  cat(paste0(round(100*getInfections(x$model, symptomatic = TRUE, fractionSymptomatic = x$parameters.internal$fractionSymptomatic, asRate = TRUE) /
+  cat(paste0(round(100*getInfections(x$model, symptomatic = x$parameters.internal$symptomaticIncidence, fractionSymptomatic = x$parameters.internal$fractionSymptomatic, asRate = TRUE) /
                x$model$parameters$populationFractions, 2), "%"), "\n")
   
   cat("\nThe model is:\n")
   print(x$model)
   
   cat("Reference seriological rate:", 
-             round(100*sum(x$parameters.internal$incidence$incidence / x$parameters.fixed$population) / x$parameters.internal$fractionSymptomatic , 2), "%")
+             round(100*sum(x$parameters.internal$incidence$incidence / x$parameters.fixed$population) / 
+                     ifelse(x$parameters.internal$symptomaticIncidence,
+                            x$parameters.internal$fractionSymptomatic,
+                            1), 2), "%")
 }
