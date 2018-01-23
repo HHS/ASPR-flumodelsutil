@@ -55,10 +55,10 @@ makeContactMatrix <- function( ages, originalContactMatrix = fitflumodels::fitfl
   #Re-group the matrix of expected contacts
   regroupedMatrixOfContacts <- matrix(0, nrow = ncol(newAgeRanges), ncol = ncol(newAgeRanges),
                                       dimnames = list(names(newAgeRanges),names(newAgeRanges))) #Initialize with a zero matrix
-  for (newRowIndex in seq_along(ncol(newAgeRanges))) {
-    for (newColumnIndex in seq_along(ncol(newAgeRanges))){
-      for (rowIndex in seq_along(ncol(originalContactMatrixAges))) {
-        for (columnIndex in seq_along(ncol(originalContactMatrixAges)))
+  for (newRowIndex in seq_along(newAgeRanges)) {
+    for (newColumnIndex in seq_along(newAgeRanges)){
+      for (rowIndex in seq_along(originalContactMatrixAges)) {
+        for (columnIndex in seq_along(originalContactMatrixAges))
           regroupedMatrixOfContacts[newRowIndex, newColumnIndex] <-
             regroupedMatrixOfContacts[newRowIndex, newColumnIndex] +
             (symmetrizedMatrixOfContacts[rowIndex, columnIndex] *
@@ -93,7 +93,7 @@ makeContactMatrix <- function( ages, originalContactMatrix = fitflumodels::fitfl
 #Assumes constant interpolation between age groups when subdividing ranges
 getPopulationForAgeRange <- function(ageRange, ages, population) {
   ageRangePopulation <- 0
-  for (columnIndex in seq_along(ncol(ages))) {
+  for (columnIndex in seq_along(ages)) {
     ageRangePopulation <- ageRangePopulation + (getAgeRangeFraction(columnIndex, ageRange, ages) * as.numeric(population[columnIndex]))
   }
   ageRangePopulation
