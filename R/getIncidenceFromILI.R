@@ -35,7 +35,9 @@ getIncidenceFromILI <- function(year, ILI = cdcfluview::ilinet(region = "nationa
   if((weeksOfBackground - round(weeksOfBackground) != 0) || weeksOfBackground < 0 || weeksOfBackground >= 0.5*nrow(ILI))
     stop("weeksOfBackground must be an integer between 0 and 1/2 nrow(ILI)")
 
-  data.year <- ILI %>% dplyr::filter(( year == year & week >= startWeekOfSeason) | (year == (year + 1) & week < startWeekOfSeason)) %>%
+  data.year <- ILI %>% 
+    dplyr::rename(ili.year = year) %>%
+    dplyr::filter(( ili.year == year & week >= startWeekOfSeason) | (ili.year == (year + 1) & week < startWeekOfSeason)) %>%
     dplyr::select(week, `weighted_ili`) %>% dplyr::rename(ILI = `weighted_ili`) %>% dplyr::filter(!is.na(ILI))
 
   if (nrow(data.year) == 0)

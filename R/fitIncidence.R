@@ -14,7 +14,7 @@
 #'    Only the required parameters from SEIRModel are listed below. Please see SEIRModel and the other models from flumodels
 #'    for a full list of parameters.
 #' @param incidence Data frame of weekly incidence. Columns are week & incidence, corresponding to week number [0-53] &
-#'    incidence in population. Not applicable as a fit parameter.
+#'    incidence in population. Not applicable as a fit parameter. Incidence is overall, not broken down by population group.
 #' @param population Size of population; defaults to 1
 #' @param populationFractions Vector of population fractions (all non-negative, sum to 1); defaults to 1, 
 #' representing a single population group
@@ -25,6 +25,7 @@
 #'   in a completely susceptible population; must be specified
 #' @param generationTime Generation time in days; must be specified.
 #' @param latentPercent Percent of total generation time spent in the latent period; must be specified.
+#' @param seedInfections Number of infections to seed the outbreak with; must be specified and greater than 0.
 #' @param method Optimiziation method. Options are L-BFGS-B from optim or any other from the list available in optim (which will cause
 #'    the alabama package's constrOptim.nl method to be called). Not applicable as a fit parameter. Defaults to L-BFGS-B.
 #' @param seedWeeksBeforeIncidence Weeks before the start of the supplied incidence curve to seed initial infections. Integer. Defaults to 0.
@@ -43,7 +44,8 @@
 #' @author Matt Clay <clay.matt@gmail.com>
 #' @export
 fitIncidence <- function(incidence, population, populationFractions, contactMatrix,
-                         R0, generationTime, latentPercent, method = "L-BFGS-B", seedWeeksBeforeIncidence = 0, 
+                         R0, generationTime, latentPercent, seedInfections = 1,
+                         method = "L-BFGS-B", seedWeeksBeforeIncidence = 0, 
                          attackRatesToMatch, symptomaticIncidence = FALSE, fractionSymptomatic = 0.5, 
                          weightIncidenceTimeseries = 1, weightAttackRates = 1, weightOverallAttackRate = 10, ...) {
   
@@ -63,6 +65,9 @@ fitIncidence <- function(incidence, population, populationFractions, contactMatr
   if (missing(latentPercent))
     stop("latentPercent must be specified")
   
+  if (seedInfections <= 0)
+    stop("seedInfections must be >0 to fit to anything.")
+  
   # Make list of argument and ensure that it's in alphabetical order
   argument.list <- as.list(match.call())[-1]
   # argument.list <- argument.list[order(names(argument.list))]
@@ -75,7 +80,7 @@ fitIncidence <- function(incidence, population, populationFractions, contactMatr
                           "weightIncidenceTimeseries", "weightAttackRates", "weightOverallAttackRate",
                           "symptomaticIncidence")
   parameters.SEIR.fixed <- parameters.fixed[ -which(names(parameters.fixed) %in% arguments.internal)]
-  # Set the minimul length of the simulation to be 35 weeks or ( the amount of incidence data we have + the seed week offset )
+  # Set the minimal length of the simulation to be 35 weeks or ( the amount of incidence data we have + the seed week offset )
   parameters.SEIR.fixed <- c(parameters.SEIR.fixed,
                              list(simulationLength = max(seedWeeksBeforeIncidence + nrow(incidence), 35) * 7 ))
   parameters.internal <- argument.list[which(names(argument.list) %in% arguments.internal)]
