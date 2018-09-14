@@ -6,7 +6,7 @@
 #' @export
 print.fitIncidence <- function(x, ...) {
   if (x$fit$convergence)
-    cat("Did not converge.")
+    cat("Did not converge!\n\n")
   
   cat("Fit the following parameters:\n")
   print(unlist(x$parameters.fitted))

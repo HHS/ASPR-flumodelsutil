@@ -175,7 +175,7 @@ fitIncidence <- function(incidence, population, populationFractions, contactMatr
   parameters.fitted <- vector(mode = "list", length = length(parameters.to.fit))
   names(parameters.fitted) <- names(parameters.to.fit)
   fitLocation <- 1
-  for (parameterIterator in seq_len(parameters.to.fit)) {
+  for (parameterIterator in seq_along(parameters.to.fit)) {
     parameter <- names(parameters.to.fit)[parameterIterator]
     value <- parameters.to.fit[[which(names(parameters.to.fit) == parameter)]]
     value.length <- length(value[[1]])
@@ -267,7 +267,7 @@ optimize.SEIRV <- function(bound.fit, incidence, attackRatesToMatch, SEIRModel.o
   parameters.to.model <- vector(mode = "list", length = length(parameters.to.fit.names))
   names(parameters.to.model) <- parameters.to.fit.names
   fitLocation <- 1
-  for (parameterIterator in seq_len(parameters.to.fit.names)) {
+  for (parameterIterator in seq_along(parameters.to.fit.names)) {
     value <- argument.list[[which(names(argument.list) == parameters.to.fit.names[parameterIterator])]]
     value.length <- length(value[[1]])
     parameters.to.model[[parameterIterator]] <- unlist(bound.fit[fitLocation:(fitLocation + value.length - 1)])
@@ -350,7 +350,7 @@ SEIR.penalty.function <- function(model, incidence, attackRatesToMatch, populati
   infections.by.week.overall <- infections.by.week.overall[is.na(infections.by.week.overall) == FALSE]
   
   # Simple L2 norm of differences in overall infections (rescaled to be a rate)
-  infections.by.week.error <- sqrt(sum( ( infections.by.week.overall[seq_len(incidence) + seedWeeksBeforeIncidence] -
+  infections.by.week.error <- sqrt(sum( ( infections.by.week.overall[seq_along(incidence) + seedWeeksBeforeIncidence] -
                                          incidence / population )^2 ))  / max(incidence / population)
   
   # Then compare attack rates by age category
@@ -373,7 +373,7 @@ SEIR.penalty.function <- function(model, incidence, attackRatesToMatch, populati
 constraint.function <- function(x, lower, upper, ...) {
   constraint <- numeric(2*length(x))
   
-  for (currentVariable in seq_len(x)) {
+  for (currentVariable in seq_along(x)) {
     constraint[(currentVariable-1)*2+1] <- x[currentVariable] - lower[currentVariable]
     constraint[currentVariable*2] <- upper[currentVariable] - x[currentVariable]
   }
@@ -391,7 +391,7 @@ constraint.function <- function(x, lower, upper, ...) {
 constraint.jacobian.create <- function(x, variables = length(x)) {
   jacobian <- matrix(0, 2 * variables, variables)
   
-  for (currentVariable in seq_len(variables)) {
+  for (currentVariable in seq_along(variables)) {
     jacobian[(currentVariable-1)*2+1,] <- c( rep(0, currentVariable - 1), 1,
                                              rep(0, variables - currentVariable) )
     jacobian[currentVariable*2,] <- c( rep(0, currentVariable - 1), -1,

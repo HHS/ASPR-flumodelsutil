@@ -35,7 +35,7 @@ rescaleIncidence <- function(incidence, totalInfections, weeksOfBackground = 3) 
   # Remove baseline incidence. Should likely make this more detailed by finding something more than min.
   # incidence.rescaled <- incidence - min(incidence)
 
-  week <- seq_len(incidence)
+  week <- seq_along(incidence)
 
   AUC <- sum(diff(week) * (incidence.rescaled[seq_len(length(incidence.rescaled) - 1)] + 
                            incidence.rescaled[seq.int(2, length(incidence.rescaled))]) / 2)
