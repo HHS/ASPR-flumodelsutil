@@ -65,7 +65,7 @@ fitIncidence <- function(incidence, population, populationFractions, contactMatr
   if (missing(latentPercent))
     stop("latentPercent must be specified")
   
-  if (seedInfections <= 0)
+  if (sum(seedInfections) <= 0)
     stop("seedInfections must be >0 to fit to anything.")
   
   # Make list of argument and ensure that it's in alphabetical order

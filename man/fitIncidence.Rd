@@ -5,15 +5,15 @@
 \title{Fit incidence}
 \usage{
 fitIncidence(incidence, population, populationFractions, contactMatrix, R0,
-  generationTime, latentPercent, method = "L-BFGS-B",
-  seedWeeksBeforeIncidence = 0, attackRatesToMatch,
-  symptomaticIncidence = FALSE, fractionSymptomatic = 0.5,
-  weightIncidenceTimeseries = 1, weightAttackRates = 1,
-  weightOverallAttackRate = 10, ...)
+  generationTime, latentPercent, seedInfections = 1,
+  method = "L-BFGS-B", seedWeeksBeforeIncidence = 0,
+  attackRatesToMatch, symptomaticIncidence = FALSE,
+  fractionSymptomatic = 0.5, weightIncidenceTimeseries = 1,
+  weightAttackRates = 1, weightOverallAttackRate = 10, ...)
 }
 \arguments{
 \item{incidence}{Data frame of weekly incidence. Columns are week & incidence, corresponding to week number [0-53] &
-incidence in population. Not applicable as a fit parameter.}
+incidence in population. Not applicable as a fit parameter. Incidence is overall, not broken down by population group.}
 
 \item{population}{Size of population; defaults to 1}
 
@@ -30,6 +30,8 @@ in a completely susceptible population; must be specified}
 \item{generationTime}{Generation time in days; must be specified.}
 
 \item{latentPercent}{Percent of total generation time spent in the latent period; must be specified.}
+
+\item{seedInfections}{Number of infections to seed the outbreak with; must be specified and greater than 0.}
 
 \item{method}{Optimiziation method. Options are L-BFGS-B from optim or any other from the list available in optim (which will cause
 the alabama package's constrOptim.nl method to be called). Not applicable as a fit parameter. Defaults to L-BFGS-B.}

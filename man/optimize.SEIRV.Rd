@@ -4,8 +4,8 @@
 \alias{optimize.SEIRV}
 \title{Compute fit value for SEIR models}
 \usage{
-optimize.SEIRV(bound.fit, incidence, attackRatesToMatch, SEIRModel.optimize,
-  parameters.to.fit.names, parameters.SEIR.fixed.names,
+optimize.SEIRV(bound.fit, incidence, attackRatesToMatch,
+  SEIRModel.optimize, parameters.to.fit.names, parameters.SEIR.fixed.names,
   symptomaticIncidence = FALSE, fractionSymptomatic = 0.5,
   seedWeeksBeforeIncidence, weightIncidenceTimeseries = 1,
   weightAttackRates = 1, weightOverallAttackRate = 10, ...)

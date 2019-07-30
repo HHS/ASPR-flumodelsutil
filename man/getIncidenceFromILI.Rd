@@ -4,16 +4,16 @@
 \alias{getIncidenceFromILI}
 \title{Get incidence from ILI data}
 \usage{
-getIncidenceFromILI(year, ILI = cdcfluview::get_flu_data(region = "national",
-  years = (year - 1):(year + 1)), startWeekOfSeason = 40, attackRateToMatch,
-  population = 1, weeksOfBackground = 3)
+getIncidenceFromILI(year, ILI = cdcfluview::ilinet(region = "national",
+  years = (year - 1):(year + 1)), startWeekOfSeason = 40,
+  attackRateToMatch, population = 1, weeksOfBackground = 3)
 }
 \arguments{
 \item{year}{Vector of ages. Each element represents the upper range of an age range. The lowest bound is presumed to be zero.
 If the oldest age does not reach the end of the population range, an additional element is added to span the full range.}
 
 \item{ILI}{Data frame containing ILI data. Defaults to requesting data directly from ILINet via cdcfluview package.
-Required columns are YEAR, WEEK, and \% WEIGHTED ILI}
+Required columns are year, week, and weighted_ili}
 
 \item{startWeekOfSeason}{Week of the year (integer) that is considered the start of the flu season. Defaults to 40.}
 
@@ -26,7 +26,7 @@ incidence curve by. Default to 3.}
 }
 \value{
 A data frame of weeks and incidence. It will only return weeks for which data exists and so may not correspond to a full year.
-   Rows are: week & incidence.
+   Columns are: week & incidence.
 }
 \description{
 Get incidence from CDC-collected ILI data

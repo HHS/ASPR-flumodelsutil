@@ -4,10 +4,11 @@
 \alias{SEIR.penalty.function}
 \title{Penalty function for SEIR-type models}
 \usage{
-SEIR.penalty.function(model, incidence, attackRatesToMatch, populationFractions,
-  population = 1, symptomaticIncidence = FALSE, fractionSymptomatic = 0.5,
-  seedWeeksBeforeIncidence = 0, weightIncidenceTimeseries = 1,
-  weightAttackRates = 1, weightOverallAttackRate = 30)
+SEIR.penalty.function(model, incidence, attackRatesToMatch,
+  populationFractions, population = 1, symptomaticIncidence = FALSE,
+  fractionSymptomatic = 0.5, seedWeeksBeforeIncidence = 0,
+  weightIncidenceTimeseries = 1, weightAttackRates = 1,
+  weightOverallAttackRate = 30)
 }
 \arguments{
 \item{model}{SEIR-type model}
