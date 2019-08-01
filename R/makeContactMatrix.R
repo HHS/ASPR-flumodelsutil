@@ -133,9 +133,11 @@ makeAgeRangesFromInputs <- function(ages) {
   newFrame <- data.frame("col1" = c(AgeStart = 0, AgeEnd = ages[1]))
   names(newFrame) <- paste0("Age00to", ages[1])
 
-  for (currentAge in seq.int(2, length(ages))) {
-    newFrame[, paste0("Age", ages[currentAge-1]+1, "to", ages[currentAge])] <-
-      c(AgeStart = ages[currentAge-1]+1, AgeEnd = ages[currentAge])
+  if (length(ages) != 1) {
+    for (currentAge in seq.int(2, length(ages))) {
+      newFrame[, paste0("Age", ages[currentAge-1]+1, "to", ages[currentAge])] <-
+        c(AgeStart = ages[currentAge-1]+1, AgeEnd = ages[currentAge])
+    }
   }
   newFrame[, paste0("Age", ages[length(ages)], "plus")] <-
     c(AgeStart = ages[currentAge]+1, AgeEnd = NA)
