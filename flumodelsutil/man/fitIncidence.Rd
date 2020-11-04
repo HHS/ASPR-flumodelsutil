@@ -4,12 +4,25 @@
 \alias{fitIncidence}
 \title{Fit incidence}
 \usage{
-fitIncidence(incidence, population, populationFractions, contactMatrix, R0,
-  generationTime, latentPercent, seedInfections = 1,
-  method = "L-BFGS-B", seedWeeksBeforeIncidence = 0,
-  attackRatesToMatch, symptomaticIncidence = FALSE,
-  fractionSymptomatic = 0.5, weightIncidenceTimeseries = 1,
-  weightAttackRates = 1, weightOverallAttackRate = 10, ...)
+fitIncidence(
+  incidence,
+  population,
+  populationFractions,
+  contactMatrix,
+  R0,
+  generationTime,
+  latentPercent,
+  seedInfections = 1,
+  method = "L-BFGS-B",
+  seedWeeksBeforeIncidence = 0,
+  attackRatesToMatch,
+  symptomaticIncidence = FALSE,
+  fractionSymptomatic = 0.5,
+  weightIncidenceTimeseries = 1,
+  weightAttackRates = 1,
+  weightOverallAttackRate = 10,
+  ...
+)
 }
 \arguments{
 \item{incidence}{Data frame of weekly incidence. Columns are week & incidence, corresponding to week number [0-53] &

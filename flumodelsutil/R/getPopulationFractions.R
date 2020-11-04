@@ -2,7 +2,7 @@
 #' @description Gets population fractions for a given set of age ranges
 #' @param ages Vector of ages. Each element represents the upper range of an age range. The lowest bound is presumed to be zero.
 #'    If the oldest age does not reach the end of the population range, an additional element is added to span the full range.
-#'    This function by default uses \code{fitflumodels_data$population.US} for age information (2015 US population).
+#'    This function by default uses \code{flumodelsutil_data$population.US} for age information (2015 US population).
 #'    One could also use the \code{acs} package to download data dynamically, but that requires the user to request an individual
 #'    key from the ACS for access.
 #' @param year Year to sample population from. Defaults to 2015.
@@ -16,9 +16,9 @@ getPopulationFractions <- function(ages,
                                    population) {
   
   if (sum(names(match.call()) == "population") == 0)
-    population <- fitflumodels::fitflumodels_data$population.US[fitflumodels::fitflumodels_data$population.US$AGE != 999 & 
-                                                                  fitflumodels::fitflumodels_data$population.US$YEAR == year & 
-                                                                  fitflumodels::fitflumodels_data$population.US$MONTH == 1, c("AGE", "TOT_POP")]
+    population <- flumodelsutil::flumodelsutil_data$population.US[flumodelsutil::flumodelsutil_data$population.US$AGE != 999 & 
+                                                                  flumodelsutil::flumodelsutil_data$population.US$YEAR == year & 
+                                                                  flumodelsutil::flumodelsutil_data$population.US$MONTH == 1, c("AGE", "TOT_POP")]
   
   if(nrow(population) == 0)
     stop("No population for given year")

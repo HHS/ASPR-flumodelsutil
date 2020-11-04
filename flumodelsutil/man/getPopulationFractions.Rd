@@ -9,7 +9,7 @@ getPopulationFractions(ages, year = 2015, population)
 \arguments{
 \item{ages}{Vector of ages. Each element represents the upper range of an age range. The lowest bound is presumed to be zero.
 If the oldest age does not reach the end of the population range, an additional element is added to span the full range.
-This function by default uses \code{fitflumodels_data$population.US} for age information (2015 US population).
+This function by default uses \code{flumodelsutil_data$population.US} for age information (2015 US population).
 One could also use the \code{acs} package to download data dynamically, but that requires the user to request an individual
 key from the ACS for access.}
 

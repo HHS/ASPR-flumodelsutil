@@ -4,10 +4,12 @@
 \alias{makeContactMatrix}
 \title{Make contact matrix}
 \usage{
-makeContactMatrix(ages,
-  originalContactMatrix = fitflumodels::fitflumodels_data$POLYMOD.matrix,
-  originalContactMatrixAges = fitflumodels::fitflumodels_data$POLYMOD.age.ranges,
-  originalPopulationFractions = fitflumodels::fitflumodels_data$population.UK)
+makeContactMatrix(
+  ages,
+  originalContactMatrix = flumodelsutil::flumodelsutil_data$POLYMOD.matrix,
+  originalContactMatrixAges = flumodelsutil::flumodelsutil_data$POLYMOD.age.ranges,
+  originalPopulationFractions = flumodelsutil::flumodelsutil_data$population.UK
+)
 }
 \arguments{
 \item{ages}{Vector of ages. Each element represents the upper range of an age range. The lowest bound is presumed to be zero.
